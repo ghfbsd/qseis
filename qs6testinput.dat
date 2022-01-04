@@ -317,3 +317,7 @@ allowed thickness of the sublayers. If the resolutions of Vp, Vs and Rho
 (density) require different thicknesses, the smallest is first chosen. If this
 is even smaller than 1% of the characteristic wavelength, then the latter is
 taken finally for the sublayer thickness.
+
+Planetary radius (km) is optional; if missing, assumes Earth (6371 km).  Earth
+flattening transformation relies on the planet radius, and for synthetics on
+bodies other than Earth it must be given.
