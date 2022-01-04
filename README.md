@@ -15,6 +15,8 @@ The modifications include:
 
 - Merged some bug fixes with QSEIS source code from Nov. 2006 version.
 
+- Output receiver positions in their units of input (km or deg).
+
 - Added program that will write SAC output files.
 
 First make the programs:

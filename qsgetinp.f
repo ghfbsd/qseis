@@ -317,7 +317,7 @@ c
       call getdata(unit,comments)
       read(comments,*)l
       if(l.gt.lmax)then
-        stop ' Error in input: to large number of layers!'
+        stop ' Error in input: too large number of layers!'
       endif
 c
 c     multilayered model parameters
@@ -329,6 +329,8 @@ c
 c
 c       input units:    -,km,  km/s, km/s, g/cm^3,-,-
 c
+        if(j.ne.i) write(*,'(a,1x,i3,a)')
+     &     '**Layer label',j,': Out of sequence, check model.'
         h(i)=km2m*h(i)
         vp(i)=km2m*vp(i)
         vs(i)=km2m*vs(i)
@@ -351,6 +353,8 @@ c
 c
 c       input units:    -,km,  km/s, km/s, g/cm^3,-,-
 c
+        if(j.ne.i) write(*,'(a,1x,i3,a)')
+     &     '**Receiver layer label',j,': Out of sequence, check model.'
         hrs(i)=km2m*hrs(i)
         vprs(i)=km2m*vprs(i)
         vsrs(i)=km2m*vsrs(i)
@@ -721,15 +725,14 @@ c
         lpath=0
       endif
 c
-      write(*,'(a)')' The receiver distance profile:'
-      do j=1,nr
-        if(mod(j,8).eq.0)then
-          write(*,'(f10.3)')r(j)/km2m
-        else
-          write(*,'(f10.3,$)')r(j)/km2m
-        endif
-      enddo
-      write(*,'(a)')' km'
+      if (kmordeg.eq.1) then
+         comments = 'km'
+      else
+         comments = 'deg'
+      endif
+      write(*,'(3a)')' The receiver distance profile (',
+     &   comments(1:index(comments,' ')-1),'):'
+      write(*,'(8f10.3)')(r(j)/dm,j=1,nr)
 c
       do istp=1,7
         do i=1,4
