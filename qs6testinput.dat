@@ -31,7 +31,10 @@
 #	===================
 # 1. receiver depth [km]
 # 2. switch for distance sampling role (1/0 = equidistant/irregular); switch
-#    for unit used (1/0 = km/deg)
+#    for unit used (1/0 = km/deg); planet radius (km) [optional, Earth assumed]
+#    Planetary radius (km) is optional; if missing, assumes Earth (6371 km).
+#    Earth flattening transformation relies on the planet radius, and for
+#    synthetics on bodies other than Earth it must be given.
 # 3. number of distance samples
 # 4. if equidistant, then start and end trace distance (> 0); else distance
 #    list (please order the receiver distances from small to large)
@@ -212,11 +215,11 @@
 #
 #	GLOBAL MODEL PARAMETERS (Note 5)
 #	================================
-# 1. switch for flat-earth-transform and planet radius
+# 1. switch for flat-earth-transform
 # 2. gradient resolution [%] of vp, vs, and ro (density), if <= 0, then default
 #    values (depending on wave length at cut-off frequency) will be used
 #------------------------------------------------------------------------------
- 0                               |int: sw_flat_earth_transform; dble: radius
+ 0                               |int: sw_flat_earth_transform;
  0.25  0.25  5.0                 |dble: vp_res, vs_res, ro_res;
 #------------------------------------------------------------------------------
 #
@@ -317,7 +320,3 @@ allowed thickness of the sublayers. If the resolutions of Vp, Vs and Rho
 (density) require different thicknesses, the smallest is first chosen. If this
 is even smaller than 1% of the characteristic wavelength, then the latter is
 taken finally for the sublayer thickness.
-
-Planetary radius (km) is optional; if missing, assumes Earth (6371 km).  Earth
-flattening transformation relies on the planet radius, and for synthetics on
-bodies other than Earth it must be given.
