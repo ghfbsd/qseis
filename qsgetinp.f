@@ -8,7 +8,7 @@ c
 c     work space
 c
       integer i,ir,istp,j,l,l1,lrs,lcut,n,ierr,iazi
-      integer irlast,irnow,is,ns
+      integer irlast,irnow,is,ns,nblen
       integer ieqdis,kmordeg,iv0,flen0,nup,nlw
       double precision rr,z,pi,taunorm,rnow,rlast,tnow,tlast,prad
       double precision v00,depth,hpmin,vsliquid
@@ -189,10 +189,7 @@ c
       read(comments,*)(outfile0(istp),istp=1,6)
       do istp=1,6
         if(ssel(istp).ne.1)ssel(istp)=0
-        do flen0=80,1,-1
-          if(outfile0(istp)(flen0:flen0).ne.' ')goto 100
-        enddo
-100     continue
+        flen0=nblen(outfile0(istp))
         outfile(1,istp)=outfile0(istp)(1:flen0)//'.tz'
         outfile(2,istp)=outfile0(istp)(1:flen0)//'.tr'
         outfile(3,istp)=outfile0(istp)(1:flen0)//'.tt'
@@ -283,10 +280,7 @@ c
       else
         read(unit,*)(azimuth(i),i=1,nr)
       endif
-      do flen0=80,1,-1
-        if(outfile0(7)(flen0:flen0).ne.' ')goto 200
-      enddo
-200   continue
+      flen0=nblen(outfile0(7))
       outfile(1,7)=outfile0(7)(1:flen0)//'.tz'
       outfile(2,7)=outfile0(7)(1:flen0)//'.tr'
       outfile(3,7)=outfile0(7)(1:flen0)//'.tt'

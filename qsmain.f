@@ -5,7 +5,7 @@ c
 c
 c     work space
 c
-      integer i,ji,jk,jl,istp,nssel,runtime
+      integer i,ji,jk,istp,nssel,runtime,nblen
       double precision pi,srate
       logical grnexist
       integer time
@@ -48,12 +48,12 @@ c
          elseif (arg .eq. '-prog') then
             oprog = .true.
          else
-            jk = index(arg,' ')-1
+            jk = nblen(arg)
             write(*,'(3a)') '**Invalid option: ',arg(1:jk),', skipped'
          endif
       enddo
       if (inputfile.eq.' ') stop '**Missing input file'
-      i = index(inputfile,' ')-1
+      i = nblen(inputfile)
       write(*,'(a,a)')' the input data file is ',inputfile(1:i)
       runtime=time()
 c
@@ -94,4 +94,13 @@ c
 1004  format(2E12.4,$)
 1005  format(2E12.4)
  500  stop
+      end
+
+      integer function nblen(string)
+      character*(*) string
+
+      do i=len(string),2,-1
+         if (string(i:i) .ne. ' ') exit
+      enddo
+      nblen = i
       end
