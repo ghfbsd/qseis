@@ -31,7 +31,7 @@ C        last update 31 Dec. 2021
       real rst(irmax),azst(irmax),raz(irmax),tt(irmax)
       real wav(mwav), mtc(6)
       character datfil*64,seifil*32,stnm(irmax)*5,arg*80
-      character outdir*32,indir*32,tok(mtok)*16,fmt*16,outnm(7)*8
+      character outdir*32,indir*32,tok(mtok)*16,fmt*16,outnm(7)*16
       character outcod(7)*8,file_name*80, bigl*8192
       real datt(nsmax)
       real dataz(nsmax,irmax),datar(nsmax,irmax),datat(nsmax,irmax)
