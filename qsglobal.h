@@ -183,7 +183,8 @@ c     input and output data files
 c
       character*80 inputfile
       common /inputdata/ inputfile
+      logical oprog
       integer ssel(7),fsel(4,7),flen(4,7)
       character*83 outfile(4,7)
-      common /outsel/ ssel,fsel,flen
+      common /outsel/ ssel,fsel,flen,oprog
       common /outdata/ outfile

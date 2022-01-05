@@ -9,6 +9,7 @@ c
       double precision pi,srate
       logical grnexist
       integer time
+      character arg*80
 c
 c     read input file file
 c
@@ -34,7 +35,23 @@ c
       print *,'#           Last modified: October, 2006             #'
       print *,'######################################################'
       print *,'                          '
-      call getarg(1,inputfile)
+      ji = 0
+      inputfile = ' '
+      oprog = .true.
+      do i=1,iargc()
+         if (i.le.ji) cycle
+         call getarg(i,arg)
+         if (arg(1:1) .ne. '-') then
+            inputfile = arg
+         elseif (arg .eq. '-noprog') then
+            oprog = .false.
+         elseif (arg .eq. '-prog') then
+            oprog = .true.
+         else
+            jk = index(arg,' ')-1
+            write(*,'(3a)') '**Invalid option: ',arg(1:jk),', skipped'
+         endif
+      enddo
       if (inputfile.eq.' ') stop '**Missing input file'
       i = index(inputfile,' ')-1
       write(*,'(a,a)')' the input data file is ',inputfile(1:i)

@@ -335,8 +335,10 @@ c
 c
 c       write(*,'(i6,a,E13.6,a,i7)')lf,'.',f,
 c    &      'Hz: slowness samples = ',1+nk2-nk1-ndtrans
-        write(finhz,'(1pe13.6,2hHz)') f
-        call spin(lf,nf,finhz(1:15))
+        if (oprog) then
+           write(finhz,'(1pe13.6,2hHz)') f
+           call spin(lf,nf,finhz(1:15))
+        endif
       enddo
 c
       if(iflat.eq.1)then
