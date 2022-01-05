@@ -163,7 +163,10 @@
 # 2. file names of Green's functions (please give the names without extensions,
 #    which will be appended by the program automatically: *.tz, *.tr, *.tt
 #    and *.tv are for the vertical, radial, tangential, and volume change (for
-#    hydrophones) components, respectively)
+#    hydrophones) components, respectively).  At least one Green's function
+#    must be selected for any seismogram output; all must be selected for P-SV
+#    seismograms, and strike-slip+dip_slip+single_f_h must be selected for SH
+#    seismograms.  If any Green's function is computed, it is also written out.
 #------------------------------------------------------------------------------
 #  explosion   strike-slip dip-slip   clvd       single_f_v  single_f_h
 #------------------------------------------------------------------------------
