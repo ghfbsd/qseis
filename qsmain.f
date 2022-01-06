@@ -1,3 +1,13 @@
+c     Usage:
+c        qsmain [ -prog | -noprog ] <input>
+c
+c     where <input> is the name of an input file.  This must be present on the
+c     command line.
+c
+c     Use -prog to show progress bar during calculation [default]
+c
+c     Use -noprog to suppress progress bar during calculation
+
       program qseis
       implicit none
 c
@@ -54,7 +64,7 @@ c
       enddo
       if (inputfile.eq.' ') stop '**Missing input file'
       i = nblen(inputfile)
-      write(*,'(a,a)')' the input data file is ',inputfile(1:i)
+      write(*,'(a,a)')' The input data file is ',inputfile(1:i)
       runtime=time()
 c
       pi=4.d0*datan(1.d0)

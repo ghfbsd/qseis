@@ -8,7 +8,7 @@ c
       integer nzmax,lmax,nrmax,nfmax,ndtransmax
       parameter(lmax=2500)
       parameter(nzmax=lmax+2)
-      parameter(nrmax=101,nfmax=2048)
+      parameter(nrmax=201,nfmax=2048)
       parameter(ndtransmax=4)
 c
 c     INDEX PARAMETERS FOR BESSEL FUNCTION TABLES

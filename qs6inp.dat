@@ -31,20 +31,18 @@
 #	===================
 # 1. receiver depth [km]
 # 2. switch for distance sampling role (1/0 = equidistant/irregular); switch
-#    for unit used (1/0 = km/deg); planet radius (km) [optional, Earth assumed]
-#    Planetary radius (km) is optional; if missing, assumes Earth (6371 km).
-#    Earth flattening transformation relies on the planet radius, and for
-#    synthetics on bodies other than Earth it must be given.
-# 3. number of distance samples
-# 4. if equidistant, then start and end trace distance (> 0); else distance
-#    list (please order the receiver distances from small to large)
+#    for unit used (1/0 = km/deg)
+# 3. number of receiver distances (or zero if given later with azimuths)
+# 4. if equidistant, then start and end trace distance (> 0); else if > 0,
+#    distance list (please order the receiver distances from small to large).
+#    If zero receivers, no list here at all.
 # 5. (reduced) time begin [sec] & length of time window [sec], number of time
 #    samples (<= 2*nfmax in qsglobal.h)
 # 6. switch for unit of the following time reduction parameter: 1 = velocity
 #    [km/sec], 0 = slowness [sec/deg]; time reduction parameter
 #------------------------------------------------------------------------------
  0.000                 |dble: receiver_depth;
- 1  0                  |int: sw_equidistant, sw_d_unit; dble: prad [optional]
+ 1  0                  |int: sw_equidistant, sw_d_unit
  31                    |int: no_distances;
  60.0 90.0             |dble: d_1,d_n; or d_1,d_2, ...(no comments in between!);
  180.0  300.0 1024     |dble: t_start,t_window; int: no_t_samples;
@@ -200,9 +198,14 @@
 #           downward(z)  \-----------------------\
 #
 # 2. switch for azimuth distribution of the stations (0 = uniform azimuth,
-#    else = irregular azimuth angles)
+#    1 = irregular azimuth angles).  If no_distances (in RECEIVER PARAMETERS)
+#    is zero, the following list (item 3) of distances azimuths defines the
+#    total number of receivers.
 # 3. list of the azimuth angles [deg] for all stations given above (if the
-#    uniform azimuth is selected, then only one azimuth angle is required)
+#    uniform azimuth is selected, then only one azimuth angle is required).
+#    If no_distances  (in RECEIVER PARAMETERS) is zero, a list of distance,
+#    azimuth and station name for each receiver follows, one per line.  The
+#    list ends with a distance AND azimuth <= 0 (no count is needed).
 #
 #------------------------------------------------------------------------------
 #     Mis        Mcl        Mdc        Strike     Dip        Rake      File

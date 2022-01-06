@@ -36,37 +36,21 @@ c
       read(comments,*)zr
       zr=km2m*zr
       call getdata(unit,comments)
-      read(comments,*,iostat=i)ieqdis,kmordeg,prad
-      if(i.ne.0)then
-         prad=6371.
-         read(comments,*)ieqdis,kmordeg
-      endif
-      rr0=prad*km2m
+      read(comments,*)ieqdis,kmordeg
       call getdata(unit,comments)
       read(comments,*)nr
       if(nr.gt.nrmax)then
-        stop 'Error in input: nr > nrmax!'  
+        write(*,'(2(1x,a,1x,i4))')'nr',nr,'nrmax',nrmax
+        stop 'Error in input: too many receivers (> nrmax)!'  
       endif
-      if(kmordeg.eq.1)then
-        dm=km2m
+      if(nr.eq.0) then
+        if (ieqdis.eq.1)
+     &    stop 'Error in input: zero receivers imply irregular spacing!'
+      else if(ieqdis.eq.1) then
+        call getdata(unit,comments)
+        read(comments,*) r1,r2
       else
-        dm=rr0*pi/180.d0
-      endif
-      if(ieqdis.eq.1.and.nr.gt.1)then
-        read(unit,*)r1,r2
-        if(nr.eq.1)then
-          dr=0.d0
-        else
-          dr=(r2-r1)/dble(nr-1)
-        endif
-        do i=1,nr
-          r(i)=dm*(r1+dr*dble(i-1))
-        enddo
-      else
-        read(unit,*)(r(i),i=1,nr)
-        do i=1,nr
-          r(i)=dm*r(i)
-        enddo
+        read(unit,*) (r(i),i=1,nr)
       endif
 c
       call getdata(unit,comments)
@@ -77,15 +61,6 @@ c
 c
       call getdata(unit,comments)
       read(comments,*)iv0,v0
-      if(iv0.eq.1)then
-        v0=km2m*v0
-      else if(v0.gt.0.d0)then
-        v0=rr0*pi/180.d0/v0
-        write(*,'(a,f10.4,a)')' Velocity for time reduction: ',
-     &                        v0/km2m,' km/s'
-      else
-        v0=0.d0
-      endif
 c
 c     wavenumber integration parameters
 c     =================================
@@ -272,7 +247,21 @@ c
       endif
       call getdata(unit,comments)
       read(comments,*)iazi
-      if(iazi.eq.0)then
+      if (nr.eq.0 .and. iazi.eq.0) stop 'Unknown number of receivers!'
+      if (nr.eq.0) then
+        i = 1
+        do 
+          j = min(i,nrmax)
+          read(unit,*) r(j),azimuth(j)
+          if (r(j).le.0 .and. azimuth(j).le.0) exit
+          i = i + 1
+        enddo
+        if (i.gt.nrmax) then
+          write(*,'(2(1x,a,1x,i4))')'nr',i-1,'nrmax',nrmax
+          stop 'Too many receivers (> nrmax)!'
+        endif
+        nr = i-1
+      else if(iazi.eq.0)then
         read(unit,*)azimuth(1)
         do i=2,nr
           azimuth(i)=azimuth(1)
@@ -301,7 +290,40 @@ c     global model parameters
 c     =======================
 c
       call getdata(unit,comments)
-      read(comments,*)iflat
+      read(comments,*,iostat=i)iflat,prad
+      if(i.ne.0)then
+        prad=6371.
+        read(comments,*)iflat
+      endif
+      rr0=prad*km2m
+      if(kmordeg.eq.1)then
+        dm=km2m
+      else
+        dm=rr0*pi/180.d0
+      endif
+      if(ieqdis.eq.1.and.nr.ge.1)then
+        if(nr.eq.1)then
+          dr=0.d0
+        else
+          dr=(r2-r1)/dble(nr-1)
+        endif
+        do i=1,nr
+          r(i)=dm*(r1+dr*dble(i-1))
+        enddo
+      else
+        do i=1,nr
+          r(i)=dm*r(i)
+        enddo
+      endif
+      if(iv0.eq.1)then
+        v0=km2m*v0
+      else if(v0.gt.0.d0)then
+        v0=rr0*pi/180.d0/v0
+        write(*,'(a,f10.4,a)')' Velocity for time reduction: ',
+     &                        v0/km2m,' km/s'
+      else
+        v0=0.d0
+      endif
       call getdata(unit,comments)
       read(comments,*)(resolut(i),i=1,3)
       do i=1,3
@@ -311,7 +333,7 @@ c
       call getdata(unit,comments)
       read(comments,*)l
       if(l.gt.lmax)then
-        stop ' Error in input: too large number of layers!'
+        stop ' Error in input: too large number of layers (>lmax)!'
       endif
 c
 c     multilayered model parameters
@@ -335,7 +357,7 @@ c
       call getdata(unit,comments)
       read(comments,*)lrs
       if(lrs.gt.lmax)then
-        stop ' Error in input: too large number of layers!'
+        stop ' Error in input: too large number of layers (>lmax)!'
       endif
 c
 c     multilayered model parameters
@@ -720,13 +742,20 @@ c
       endif
 c
       if (kmordeg.eq.1) then
-         comments = 'km'
+        comments = 'km'
       else
-         comments = 'deg'
+        comments = 'deg'
       endif
-      write(*,'(3a)')' The receiver distance profile (',
-     &   comments(1:index(comments,' ')-1),'):'
-      write(*,'(8f10.3)')(r(j)/dm,j=1,nr)
+      i = nblen(comments)
+      if (iazi.eq.0) then
+        write(*,'(3a,f5.1,a)')' The receiver distance profile (',
+     &    comments(1:i),' along az ',azimuth(1),'):'
+        write(*,'(8f10.3)')(r(j)/dm,j=1,nr)
+      else
+        write(*,'(3a)') 'Receivers at distance/azimuth (',
+     &    comments(1:i),'):'
+        write(*,'((4(1x,f10.2,1h/,f5.1)))') (r(j)/dm,azimuth(j),j=1,nr)
+      endif
 c
       do istp=1,7
         do i=1,4

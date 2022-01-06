@@ -24,15 +24,15 @@ C
 C     Use -debug to see random debug output.
 C
 C     G. Helffrich, ELSI / Tokyo Tech
-C        last update 31 Dec. 2021
+C        last update 06 Jan. 2022
 
-      parameter (irmax=100,nsmax=2**15)
+      parameter (irmax=200,nsmax=2**15)
       parameter (mtok=20, mwav=256)
       real rst(irmax),azst(irmax),raz(irmax),tt(irmax)
       real wav(mwav), mtc(6)
       character datfil*64,seifil*32,stnm(irmax)*5,arg*80
       character outdir*32,indir*32,tok(mtok)*16,fmt*16,outnm(7)*16
-      character outcod(7)*8,file_name*80, bigl*8192
+      character outcod(7)*8,file_name*80, bigl*8192 
       real datt(nsmax)
       real dataz(nsmax,irmax),datar(nsmax,irmax),datat(nsmax,irmax)
       integer otyp,outsw(7)
@@ -104,17 +104,18 @@ c1  1                  |int: sw_equidistant, sw_d_unit;  0 = deg, 1 = km
       call in(lnum,arg)
 c60                    |int: no_distances;
       read(arg,*,iostat=ios) ndist
-      call in(lnum,arg)
 c5.0 300.0             |dble: d_1,d_n; or d_1,d_2, ...(no comments in between!);
-      if (ieq.eq.1) then
+      if (ieq.eq.1.and.ndist.gt.0) then
+         call in(lnum,arg)
          read(arg,*,iostat=ios) rmin,rmax
          dr = (rmax-rmin)/max(1,ndist-1)
          do i=1,ndist
             rst(i) = rmin + (i-1)*dr
          enddo
-      else
+      else if (ndist.gt.0) then
          i = 0
          do 
+            call in(lnum,arg)
             ix = nclen(arg)
             do j=1,ix
                if (arg(j:j).eq.',') arg(j:j) = ' '
@@ -125,7 +126,6 @@ c5.0 300.0             |dble: d_1,d_n; or d_1,d_2, ...(no comments in between!);
                read(tok(j),*,iostat=ios) rst(i)
             enddo
             if (i .ge. ndist) exit
-            call in(lnum,arg)
          enddo
       endif
       call in(lnum,arg)
@@ -135,20 +135,6 @@ c0.0  8.0  1024        |dble: t_start,t_window; int: no_t_samples;
       call in(lnum,arg)
 c1  6.5                |int: sw_t_reduce; dble: t_reduce;
       read(arg,*,iostat=ios) ired, tred
-      do i=1,ndist
-         if (tred.gt.0.0) then
-            if (iun.ne.ired) then
-               print*,'**Velocity reduction unit mismatch to distance'
-               tt(i) = t0
-            else if (iun.eq.0) then
-               tt(i) = t0 + rst(i)*tred
-            else
-               tt(i) = t0 + rst(i)/tred
-            endif
-         else
-            tt(i) = t0
-         endif
-      enddo
       call in(lnum,arg)
 c2                                   |int: sw_algorithm;
       read(arg,*,iostat=ios) ialg
@@ -217,10 +203,11 @@ c 1  -0.36e+019 -5.12e+019  5.48e+019 -6.21e+019  2.40e+019 -3.84e+019 'seis'
       if (iaz.eq.0) then
          iaz = 1
          read(arg,*,iostat=ios) azst(1)
-         do i=2,ndist
+         do i=1,ndist
+            write(stnm(i),'(i4.4)') i
             azst(i) = azst(1)
          enddo
-      else
+      else if (ndist.gt.0) then
          i = 0
          do 
             ix = nclen(arg)
@@ -231,13 +218,39 @@ c 1  -0.36e+019 -5.12e+019  5.48e+019 -6.21e+019  2.40e+019 -3.84e+019 'seis'
             do j=1,n
                i = i + 1
                read(tok(j),*,iostat=ios) azst(i)
+               write(stnm(i),'(i4.4)') i
             enddo
             if (i .ge. ndist) exit
             call in(lnum,arg)
          enddo
+      else
+         i = 1
+         do
+            ix = nclen(arg)
+            do j=1,ix
+               if (arg(j:j).eq.',') arg(j:j) = ' '
+            enddo
+            call tokens(arg(1:ix),mtok,n,tok)
+            if (n.ne.3) goto 1000
+            j = min(i,irmax)
+            read(tok(1),*,iostat=ios) rst(j)
+            if (ios.ne.0) goto 1000
+            read(tok(2),*,iostat=ios) azst(j)
+            if (ios.ne.0) goto 1000
+            if (rst(j).le.0 .and. azst(j).le.0) exit
+            stnm(j) = tok(3)
+            i = i + 1
+            call in(lnum,arg)
+            if (lnum .lt. 0) exit
+         enddo
+         if (i.gt.irmax) then
+            write(*,'(a,1x,i3)') 'List length',i
+            stop 'Too many stations!'
+         endif
+         ndist = i-1
       endif
       call in(lnum,arg)
-c0                               |int: sw_flat_earth_transform;
+c0                               |int: sw_flat_earth_transform; dble: radius
       call tokens(arg(1:nclen(arg)),mtok,n,tok)
       prad = 6371.
       if (n.gt.1) then
@@ -259,6 +272,22 @@ c                                skip reading model
       enddo
 c     -------------------------- end of input
 
+c     Calculate trace start times
+      do i=1,ndist
+         if (tred.gt.0.0) then
+            if (iun.ne.ired) then
+               print*,'**Velocity reduction unit mismatch to distance'
+               tt(i) = t0
+            else if (iun.eq.0) then
+               tt(i) = t0 + rst(i)*tred
+            else
+               tt(i) = t0 + rst(i)/tred
+            endif
+         else
+            tt(i) = t0
+         endif
+      enddo
+
 c     Calculate receiver positions, azimuths and times
       lst = ndist
       write(*,4003) lst
@@ -267,8 +296,9 @@ c     Calculate receiver positions, azimuths and times
          write(*,'('' dist--azi (epi to sta)--travel time'')')
       endif
       do i=1,lst
-         if (lst.le.10 .or. odeb) write(*,4004) rst(i),azst(i),tt(i)
-4004     format(f10.1,2(1x,f9.3))
+         if (lst.le.10 .or. odeb)
+     &      write(*,4004) rst(i),azst(i),tt(i),stnm(i)
+4004     format(f10.1,2(1x,f9.3),1x,a)
       enddo
 
 c     ---------------------------------
@@ -334,9 +364,9 @@ c     Prepare to write seismogram
       do i=1,lst
          evla=0.001
          evlo=0.001
-         write(stnm(i),'(i4.4)') i
+         ix = nblen(stnm(i))
          write(file_name,'(a,1h/,a,1h.,a)')
-     *      outdir(1:nblen(outdir)),stnm(i)(1:4),outnm(otyp)
+     *      outdir(1:nblen(outdir)),stnm(i)(1:ix),outnm(otyp)
          kif = index(file_name,' ')
          if (iun.eq.0) then
             gcarc = rst(i)
@@ -425,6 +455,10 @@ C        SH seismograms
      &      file_name(1:nblen(file_name)),'.'
       enddo
       stop
+
+1000  continue
+      write(*,'(a,1x,i3)') 'Error: Station',i
+      stop 'Missing or bad distance/azimuth/name info'
       end
 
       subroutine in(lnum,line)
@@ -434,6 +468,7 @@ C        SH seismograms
          read(8,'(a)',iostat=ios) line
          if (ios.ne.0)
      *      write(*,'(a,i4)') '**Early end of input, line ',lnum
+         if (ios.ne.0) lnum = -2
          if (line(1:1).ne.'#' .or. ios.ne.0) exit
       enddo
 c     print*,line(1:nblen(line))
