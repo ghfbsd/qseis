@@ -56,4 +56,16 @@ There are two test input files included with the source code.
    r 0031.seis-2.z  ;* reads data file
    m ttsac          ;* plots seismogram, marks phase arrivals
    quit
+
+- **Mars test** (vertical incidence, ambient noise autocorrelation synthetic).
+  There will be 8 seismograms written at offsets from 0-5 km, 10 and 50 km.
+  Explosive source at 60 km depth.
+  ```
+   qsmain qs6testmars.dat                ## runs synthetics
+   qseissac qs6testmars.dat              ## writes SAC files
+   sac
+   r D*K.mex.z      ;* reads data files
+   xlim 250 400     ;* window arrival of 410 km disc. analog and PcP
+   p1               ;* plots seismograms
+   quit
   ```
