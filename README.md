@@ -56,6 +56,7 @@ There are two test input files included with the source code.
    r 0031.seis-2.z  ;* reads data file
    m ttsac          ;* plots seismogram, marks phase arrivals
    quit
+  ```
 
 - **Mars test** (vertical incidence, ambient noise autocorrelation synthetic).
   There will be 8 seismograms written at offsets from 0-5 km, 10 and 50 km.
