@@ -21,4 +21,4 @@ qseissac: qseissac.o tokens.o gcdist.o
 
 clean: ; /bin/rm -f *.o
 
-distclean: ; /bin/rm -f *.o qsmain qseissac *.t[rtzv] *.seis{,-2}.[rtz]
+distclean: ; /bin/rm -f *.o qsmain qseissac *.t[rtzv] *.{seis,mex}{,-2}.[rtz]
