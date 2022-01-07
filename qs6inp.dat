@@ -221,7 +221,9 @@
 #
 #	GLOBAL MODEL PARAMETERS (Note 5)
 #	================================
-# 1. switch for flat-earth-transform and planet radius
+# 1. switch for flat-earth-transform; planet radius (km) [optional, Earth
+#    assumed]. Earth flattening transformation relies on the planet radius, and
+#    for synthetics on bodies other than Earth it must be given.
 # 2. gradient resolution [%] of vp, vs, and ro (density), if <= 0, then default
 #    values (depending on wave length at cut-off frequency) will be used
 #------------------------------------------------------------------------------
