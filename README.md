@@ -24,7 +24,8 @@ First make the programs:
 make qsmain qseissac
 ```
 
-There are two test input files included with the source code.
+See these annotated test input files included with the source code for details
+on preparing input.
 
 - **Simple test** (regional crustal propagation synthetics).
   There will be 60 seismograms written at 5 km offsets out to 300 km distance.
@@ -57,6 +58,9 @@ There are two test input files included with the source code.
    m ttsac          ;* plots seismogram, marks phase arrivals
    quit
   ```
+  See [this url](https://members.elsi.jp/~george/sac-bugs.html#ttimes) and
+  [this url](https://github.com/ghfbsd/sacbook/methods) and for making the
+  ttsac macro available to your version of SAC.
 
 - **Mars test** (vertical incidence, ambient noise autocorrelation synthetic).
   There will be 8 seismograms written at offsets from 0-5 km, 10 and 50 km.
