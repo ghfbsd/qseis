@@ -59,8 +59,8 @@ on preparing input.
    quit
   ```
   See [this url](https://members.elsi.jp/~george/sac-bugs.html#ttimes) and
-  [this url](https://github.com/ghfbsd/sacbook/methods) and for making the
-  ttsac macro available to your version of SAC.
+  [this url](https://github.com/ghfbsd/sacbook/tree/master/methods/split) and
+  for making the ttsac macro available to your version of SAC.
 
 - **Mars test** (vertical incidence, ambient noise autocorrelation synthetic).
   There will be 8 seismograms written at offsets from 0-5 km, 10 and 50 km.
